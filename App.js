@@ -78,9 +78,13 @@ export default class App extends React.Component {
     
            <List dataArray={this.state.dataSource}
                   renderRow={(rowData) =>
-                    <ListItem button onPress={() => this.itemClick() } >
-                      <Text>{rowData.title}, {rowData.releaseYear}</Text>
-                      <Entypo iconRight style={styles.rightChevron} name="chevron-small-right" size={25} />
+                    <ListItem icon button onPress={() => this.itemClick()}>
+                      <Body>
+                        <Text >{rowData.title}, {rowData.releaseYear}</Text>
+                      </Body>
+                      <Right>
+                        <Entypo style={styles.rightChevron}  name="chevron-small-right" size={25} />
+                      </Right>
                     </ListItem>
                   }>
           </List>
@@ -118,6 +122,6 @@ const styles = StyleSheet.create({
     color : 'gray'
   },
   rightChevron: {
-    color : 'gray'
-  },
+    color: 'gray'
+  }
 });
