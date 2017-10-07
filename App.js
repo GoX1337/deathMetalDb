@@ -8,18 +8,45 @@ export default class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { text: '', isLoading: true};
+    this.state = { 
+      text: '', 
+      isLoading: true,
+      dataSource: []
+    };
   }
 
-  componentDidMount() {
-    return fetch('https://facebook.github.io/react-native/movies.json')
+  concatUrlParams(url, params){
+    let qs = "";
+    let first = true;
+    Object.keys(params).forEach((p)=>{
+      if(first){
+        qs += "?";
+        first = false;
+      } else {
+        qs += "&";
+      }
+      qs += p + "=" + params[p];
+    });
+    return url + qs;
+  }
+
+  callBandApi(bandName) {
+    let params = {
+      token : this.state.token,
+      genre:"death.metal",
+      name: bandName
+    }
+    let url = this.concatUrlParams("http://vps302763.ovh.net:1337/api/bands", params);
+
+    return fetch(url)
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
           isLoading: false,
-          dataSource: responseJson.movies,
+          dataSource: responseJson.data,
         }, function() {
-          alert(JSON.stringify(this.state.dataSource));
+          //alert(JSON.stringify(this.state.dataSource));
+          this.render();
         });
       })
       .catch((error) => {
@@ -27,10 +54,38 @@ export default class App extends React.Component {
       });
   }
 
-  resetButton(){
+  getToken(callback){
+    let headers = {'Accept': 'application/json','Content-Type': 'application/json'};
+    return fetch("http://vps302763.ovh.net:1337/api/token", { method: "POST", headers: headers,body: JSON.stringify({ "password":"topkek"})})
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState({
+        isLoading: false,
+        token: responseJson.token,
+      }, function() {
+        if(callback){
+          //alert(JSON.stringify(this.state.token));
+          callback();
+        }
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+
+  componentDidMount() {
+    this.getToken();
+  }
+
+  resetInput(){
+    this.setState({text: ''})
+  }
+
+  resetButtonRender(){
     if (this.state.text != "") {
       return (
-        <Button onPress={()=> this.setState({text: ''})} title="" transparent >
+        <Button onPress={()=>this.resetInput()} title="" transparent >
           <Entypo name="circle-with-cross" size={25} />
         </Button>
       );
@@ -41,18 +96,17 @@ export default class App extends React.Component {
 
   onChangeText = (text)=>{
     this.setState({text});
-    
+    this.callBandApi(text);
   }
 
   itemClick = ()=>{
-    //alert('click');
+    alert('Band detail coming soon...');
   }
   
   render() {
-
     if (this.state.isLoading) {
       return (
-        <View style={{flex: 1, paddingTop: 20}}>
+        <View style={{flex: 1, paddingTop: 100}}>
           <ActivityIndicator />
         </View>
       );
@@ -73,14 +127,14 @@ export default class App extends React.Component {
                           keyboardType={"web-search"}
                           inlineImageLeft='magnifying-glass'
                           returnKeyLabel={"search"}/>
-              {this.resetButton()}
+              {this.resetButtonRender()}
            </Item>
     
            <List dataArray={this.state.dataSource}
                   renderRow={(rowData) =>
-                    <ListItem icon button onPress={() => this.itemClick()}>
+                    <ListItem icon button onPress={() => this.itemClick(rowData)}>
                       <Body>
-                        <Text >{rowData.title}, {rowData.releaseYear}</Text>
+                        <Text >{rowData.name} ({rowData.country})</Text>
                       </Body>
                       <Right>
                         <Entypo style={styles.rightChevron}  name="chevron-small-right" size={25} />
@@ -100,12 +154,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center'
-  },
-  title: {
-    fontSize: 25,
-    marginBottom : 15,
-    marginTop : 10,
-    textAlign : 'center'
   },
   input: {
     height: 45, 
