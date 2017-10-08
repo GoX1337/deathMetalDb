@@ -2,5 +2,7 @@
   "expo": {
     "name": "Death metal database",
     "sdkVersion": "18.0.0"
-  }
+  },
+  "name": "deathmetaldb",
+  "displayName": "Death metal database"
 }
