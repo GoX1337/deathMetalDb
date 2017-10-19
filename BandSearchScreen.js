@@ -100,7 +100,7 @@ class BandSearchScreen extends React.Component {
       }
     
       itemClick = (band)=>{
-        this.props.navigation.navigate('BandDetails', { name: band.name });
+        this.props.navigation.navigate('BandDetails', { 'band': band });
       }
       
       render() {
