@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View, TextInput, ScrollView, ListView, ActivityIndicator } from 'react-native';
 import { Container, Header, Title, Content, Button, Left, Right, Body, Icon, Item, Input, List, ListItem, Thumbnail} from 'native-base';
-import { Entypo, Foundation } from '@expo/vector-icons';
+import { Entypo, Foundation } from 'react-native-vector-icons';
 import styles from './Styles';
 
 class BandSearchScreen extends React.Component {
