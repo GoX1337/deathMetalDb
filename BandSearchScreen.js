@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text, View, TextInput, ScrollView, ListView, ActivityIndicator } from 'react-native';
 import { Container, Header, Title, Content, Button, Left, Right, Body, Icon, Item, Input, List, ListItem, Thumbnail} from 'native-base';
-import { Entypo, Foundation } from 'react-native-vector-icons';
+import Foundation from 'react-native-vector-icons/Foundation';
+import Entypo from 'react-native-vector-icons/Entypo';
 import styles from './Styles';
 
 class BandSearchScreen extends React.Component {
@@ -54,23 +55,22 @@ class BandSearchScreen extends React.Component {
           });
       }
     
-      getToken(callback){
+      getToken(){
         let headers = {'Accept': 'application/json','Content-Type': 'application/json'};
         return fetch("http://vps302763.ovh.net:1337/api/token", { method: "POST", headers: headers,body: JSON.stringify({ "password":"topkek"})})
         .then((response) => response.json())
         .then((responseJson) => {
+          alert(JSON.stringify(responseJson.token));
           this.setState({
             isLoading: false,
             token: responseJson.token,
           }, function() {
-            if(callback){
-              //alert(JSON.stringify(this.state.token));
-              callback();
-            }
+              alert(JSON.stringify(this.state.token));
           });
         })
         .catch((error) => {
           console.error(error);
+          alert("ERR " + JSON.stringify(error));
         });
       }
     
