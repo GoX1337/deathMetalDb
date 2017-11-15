@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, TextInput, ScrollView, ListView, ActivityIndicator } from 'react-native';
+import { Text, View, TextInput, ScrollView, ListView } from 'react-native';
 import { Container, Header, Title, Content, Button, Left, Right, Body, Icon, Item, Input, List, ListItem} from 'native-base';
 import Foundation from 'react-native-vector-icons/Foundation';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -67,8 +67,7 @@ class BandSearchScreen extends React.Component {
         .then((response) => response.json())
         .then((responseJson) => {
           this.setState({
-            isLoading: false,
-            token: responseJson.token,
+             token: responseJson.token,
           }, function() {
               //alert(JSON.stringify(this.state.token));
               callback();
@@ -82,29 +81,29 @@ class BandSearchScreen extends React.Component {
 
       getCountries(){
         let params = {
-          token : this.state.token
+          token : this.state.token,
+          genre:"death.metal"
         }
-        let url = this.concatUrlParams("http://vps302763.ovh.net:1337/api/bands", params);
+        let url = this.concatUrlParams("http://vps302763.ovh.net:1337/api/countries", params);
     
         return fetch(url)
           .then((response) => response.json())
           .then((responseJson) => {
             this.setState({
               isLoading: false,
-              countries: responseJson.data,
+              countries: responseJson ,
             }, function() {
-              //alert(JSON.stringify(this.state.dataSource));
-              this.render();
+              //alert(JSON.stringify(this.state.countries));
             });
           })
           .catch((error) => {
             console.error(error);
           });
-      }
+      } 
     
       componentDidMount() {
         this.getToken(()=>{
-          getCountries();
+          this.getCountries();
         });
       }
     
@@ -134,44 +133,12 @@ class BandSearchScreen extends React.Component {
       }
       
       render() {
-        if (this.state.isLoading) {
-          return (
-            <View style={{flex: 1, paddingTop: 100}}>
-              <ActivityIndicator />
-            </View>
-          );
-        }
-
-        return (
+        return(
         <Container>
-            <Item>
-                <Foundation style={styles.iconMagniGlass} name="magnifying-glass" size={25} />
-                <TextInput style={styles.input} 
-                            onChangeText={(text) => this.onChangeText(text)} 
-                            value={this.state.text} 
-                            placeholder="Country..." 
-                            autoCorrect={false}
-                            underlineColorAndroid="transparent" 
-                            keyboardType={"web-search"}
-                            inlineImageLeft='magnifying-glass'
-                            returnKeyLabel={"search"}/>
-                {this.resetButtonRender()}
-             </Item>
-
-             <List dataArray={this.state.dataSource}
-                    renderRow={(rowData) =>
-                      <ListItem icon button onPress={() => this.itemClick(rowData)}>
-                        <Body>
-                          <Text >{rowData.name} ({rowData.country})</Text>
-                        </Body>
-                        <Right>
-                          <Entypo style={styles.rightChevron}  name="chevron-small-right" size={25} />
-                        </Right>
-                      </ListItem>
-                    }>
-            </List>
-        </Container>
-        );
+        <Item>
+          <Text >Soon...</Text>
+          </Item>       
+      </Container>);
       }
     };
 

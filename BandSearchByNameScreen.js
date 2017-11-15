@@ -82,7 +82,7 @@ class BandSearchScreen extends React.Component {
 
       componentDidMount() {
         this.getToken(()=>{
-          alert(JSON.stringify(this.state.token));
+          //alert(JSON.stringify(this.state.token));
         });
       }
     
