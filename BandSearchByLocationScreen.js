@@ -1,12 +1,18 @@
 import React from 'react';
 import { Text, View, TextInput, ScrollView, ListView, ActivityIndicator } from 'react-native';
-import { Container, Header, Title, Content, Button, Left, Right, Body, Icon, Item, Input, List, ListItem, Thumbnail} from 'native-base';
+import { Container, Header, Title, Content, Button, Left, Right, Body, Icon, Item, Input, List, ListItem} from 'native-base';
 import Foundation from 'react-native-vector-icons/Foundation';
 import Entypo from 'react-native-vector-icons/Entypo';
 import styles from './Styles';
 
 class BandSearchScreen extends React.Component {
     
+        static navigationOptions = ({ navigation }) => ({
+            headerStyle: {
+                height: 0
+            }
+        });
+
         constructor(props) {
             super(props);
             this.state = { 
@@ -55,17 +61,17 @@ class BandSearchScreen extends React.Component {
           });
       }
     
-      getToken(){
+      getToken(callback){
         let headers = {'Accept': 'application/json','Content-Type': 'application/json'};
         return fetch("http://vps302763.ovh.net:1337/api/token", { method: "POST", headers: headers,body: JSON.stringify({ "password":"topkek"})})
         .then((response) => response.json())
         .then((responseJson) => {
-          alert(JSON.stringify(responseJson.token));
           this.setState({
             isLoading: false,
             token: responseJson.token,
           }, function() {
-              alert(JSON.stringify(this.state.token));
+              //alert(JSON.stringify(this.state.token));
+              callback();
           });
         })
         .catch((error) => {
@@ -73,9 +79,33 @@ class BandSearchScreen extends React.Component {
           alert("ERR " + JSON.stringify(error));
         });
       }
+
+      getCountries(){
+        let params = {
+          token : this.state.token
+        }
+        let url = this.concatUrlParams("http://vps302763.ovh.net:1337/api/bands", params);
+    
+        return fetch(url)
+          .then((response) => response.json())
+          .then((responseJson) => {
+            this.setState({
+              isLoading: false,
+              countries: responseJson.data,
+            }, function() {
+              //alert(JSON.stringify(this.state.dataSource));
+              this.render();
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     
       componentDidMount() {
-        this.getToken();
+        this.getToken(()=>{
+          getCountries();
+        });
       }
     
       resetInput(){
@@ -111,38 +141,36 @@ class BandSearchScreen extends React.Component {
             </View>
           );
         }
-    
+
         return (
-          <Container>
-            <Content>
-                <Item>
-                  <Foundation style={styles.iconMagniGlass} name="magnifying-glass" size={25} />
-                  <TextInput style={styles.input} 
-                              onChangeText={(text) => this.onChangeText(text)} 
-                              value={this.state.text} 
-                              placeholder="Band name, country, city..." 
-                              autoCorrect={false}
-                              underlineColorAndroid="transparent" 
-                              keyboardType={"web-search"}
-                              inlineImageLeft='magnifying-glass'
-                              returnKeyLabel={"search"}/>
-                  {this.resetButtonRender()}
-               </Item>
-        
-               <List dataArray={this.state.dataSource}
-                      renderRow={(rowData) =>
-                        <ListItem icon button onPress={() => this.itemClick(rowData)}>
-                          <Body>
-                            <Text >{rowData.name} ({rowData.country})</Text>
-                          </Body>
-                          <Right>
-                            <Entypo style={styles.rightChevron}  name="chevron-small-right" size={25} />
-                          </Right>
-                        </ListItem>
-                      }>
-              </List>
-            </Content>
-          </Container>
+        <Container>
+            <Item>
+                <Foundation style={styles.iconMagniGlass} name="magnifying-glass" size={25} />
+                <TextInput style={styles.input} 
+                            onChangeText={(text) => this.onChangeText(text)} 
+                            value={this.state.text} 
+                            placeholder="Country..." 
+                            autoCorrect={false}
+                            underlineColorAndroid="transparent" 
+                            keyboardType={"web-search"}
+                            inlineImageLeft='magnifying-glass'
+                            returnKeyLabel={"search"}/>
+                {this.resetButtonRender()}
+             </Item>
+
+             <List dataArray={this.state.dataSource}
+                    renderRow={(rowData) =>
+                      <ListItem icon button onPress={() => this.itemClick(rowData)}>
+                        <Body>
+                          <Text >{rowData.name} ({rowData.country})</Text>
+                        </Body>
+                        <Right>
+                          <Entypo style={styles.rightChevron}  name="chevron-small-right" size={25} />
+                        </Right>
+                      </ListItem>
+                    }>
+            </List>
+        </Container>
         );
       }
     };
