@@ -18,6 +18,7 @@ class BandSearchScreen extends React.Component {
             this.state = { 
                 text: '', 
                 isLoading: true,
+                isLoadingBands: true,
                 dataSource: []
             };
        }
@@ -50,6 +51,7 @@ class BandSearchScreen extends React.Component {
           .then((responseJson) => {
             this.setState({
               isLoading: false,
+              isLoadingBands: false,
               dataSource: responseJson.data,
             }, function() {
               //alert(JSON.stringify(this.state.dataSource));
@@ -68,6 +70,7 @@ class BandSearchScreen extends React.Component {
         .then((responseJson) => {
           this.setState({
             isLoading: false,
+            isLoadingBands: false,
             token: responseJson.token,
           }, function() {
               //alert(JSON.stringify(this.state.token));
@@ -103,7 +106,7 @@ class BandSearchScreen extends React.Component {
       }
     
       onChangeText = (text)=>{
-        this.setState({text});
+        this.setState({text, isLoadingBands: true});
         this.callBandApi(text);
       }
     
@@ -136,6 +139,13 @@ class BandSearchScreen extends React.Component {
                 {this.resetButtonRender()}
              </Item>
 
+             {  this.state.isLoadingBands &&
+              <View style={{flex: 1, paddingTop: 100}}>
+                <ActivityIndicator />
+              </View>
+             }
+
+            { !this.state.isLoadingBands &&
              <List dataArray={this.state.dataSource}
                     renderRow={(rowData) =>
                       <ListItem icon button onPress={() => this.itemClick(rowData)}>
@@ -148,6 +158,7 @@ class BandSearchScreen extends React.Component {
                       </ListItem>
                     }>
             </List>
+            }
         </Container>
         );
       }
