@@ -30,6 +30,10 @@ const TabNav = TabNavigator(
       style: {
         backgroundColor: 'black',
       },
+      indicatorStyle: {
+        borderBottomColor: 'red',
+        borderBottomWidth: 3
+      }
     }
   }
 );
