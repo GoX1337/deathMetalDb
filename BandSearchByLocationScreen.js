@@ -125,15 +125,23 @@ class BandSearchScreen extends React.Component {
           return null;
         }
       }
-    
+
       onChangeText = (text)=>{
         let regex = new RegExp(["^",".*", text,".*", "$"].join(""), "i");
         this.setState({text});
         this.state.filteredCountries = [];
         this.state.countrySelected = false;
+        this.state.isLoading = true;
+        this.setState({isLoading: true});
+        let itemsProcessed = 0;
+
         this.state.countries.forEach((c)=>{
+          itemsProcessed++;
           if(c.match(regex))
             this.state.filteredCountries.push(c);
+          if(itemsProcessed === this.state.countries.length){
+            this.setState({isLoading: false});
+         }           
         });
       }
     
