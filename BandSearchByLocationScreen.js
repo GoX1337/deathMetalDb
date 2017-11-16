@@ -21,7 +21,10 @@ class BandSearchScreen extends React.Component {
                 countries: [],
                 filteredCountries: [],
                 countrySelected: false,
-                dataSource: []
+                dataSource: [],
+                page:1,
+                scrolledItem:0,
+                nextPageMilestone:60
             };
        }
     
@@ -94,8 +97,36 @@ class BandSearchScreen extends React.Component {
             this.setState({
               isLoading: false,
               dataSource: responseJson.data,
+              page:1
             }, function() {
               //alert(JSON.stringify(this.state.dataSource));
+              this.render();
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      callBandNextPageApi(country, page) {
+        let params = {
+          token : this.state.token,
+          genre:"death.metal",
+          country: country,
+          page: page
+        }
+        let url = this.concatUrlParams("http://vps302763.ovh.net:1337/api/bands", params);
+    
+        return fetch(url)
+          .then((response) => response.json())
+          .then((responseJson) => {
+            let ds = this.state.dataSource;
+            let itemsList = ds.concat(responseJson.data);
+            this.setState({
+              isLoading: false,
+              isLoadingBands: false,
+              dataSource: itemsList
+            }, function() {
               this.render();
             });
           })
@@ -111,7 +142,15 @@ class BandSearchScreen extends React.Component {
       }
     
       resetInput(){
-        this.setState({text: ''});
+        this.setState(
+          {
+            text: '',
+            page:1,
+            scrolledItem:0,
+            nextPageMilestone:60,
+            dataSource:[]
+          }
+        )
       }
     
       resetButtonRender(){
@@ -134,6 +173,12 @@ class BandSearchScreen extends React.Component {
         this.state.isLoading = true;
         this.setState({isLoading: true});
         let itemsProcessed = 0;
+        this.setState(
+          {
+          page:1,
+          scrolledItem:0,
+          nextPageMilestone:60
+        });
 
         this.state.countries.forEach((c)=>{
           itemsProcessed++;
@@ -152,6 +197,21 @@ class BandSearchScreen extends React.Component {
 
       itemClickBand = (band)=>{
         this.props.navigation.navigate('BandDetails', { 'band': band });
+      }
+
+      setCurrentReadOffset = (event) => {
+        let itemHeight = 44;
+        let currentOffset = Math.floor(event.nativeEvent.contentOffset.y);
+        let currentItemIndex = Math.ceil(currentOffset / itemHeight);
+
+        this.state.scrolledItem = currentItemIndex;
+
+        if(this.state.scrolledItem > this.state.nextPageMilestone){
+          this.state.scrolledItem = 0;
+          this.state.nextPageMilestone += 60;
+          this.callBandNextPageApi(this.state.text, ++this.state.page);
+          //alert("page " +this.state.page);
+        }
       }
       
       render() {
@@ -196,18 +256,20 @@ class BandSearchScreen extends React.Component {
             { 
               !this.state.isLoading &&
               this.state.countrySelected &&
-              <List dataArray={this.state.dataSource}
-                      renderRow={(rowData) =>
-                        <ListItem icon button onPress={() => this.itemClickBand(rowData)}>
-                          <Body>
-                            <Text >{rowData.name} ({rowData.country})</Text>
-                          </Body>
-                          <Right>
-                            <Entypo style={styles.rightChevron}  name="chevron-small-right" size={25} />
-                          </Right>
-                        </ListItem>
-                      }>
-              </List>
+              <Content scrollEventThrottle={300} onScroll={this.setCurrentReadOffset} removeClippedSubviews={true}>
+                <List dataArray={this.state.dataSource}
+                        renderRow={(rowData) =>
+                          <ListItem icon button onPress={() => this.itemClickBand(rowData)}>
+                            <Body>
+                              <Text >{rowData.name} ({rowData.country})</Text>
+                            </Body>
+                            <Right>
+                              <Entypo style={styles.rightChevron}  name="chevron-small-right" size={25} />
+                            </Right>
+                          </ListItem>
+                        }>
+                </List>
+              </Content>
             }
           </Container>
         );
