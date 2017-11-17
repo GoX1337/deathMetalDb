@@ -3,3 +3,4 @@ node_modules/
 npm-debug.*
 android/app/build/
 android/.gradle/
+android/app/my-release-key.keystore
